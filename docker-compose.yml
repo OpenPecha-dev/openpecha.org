@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx:1.17.5-alpine
+    restart: unless-stopped
+    volumes:
+      - ./reverse_proxy:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+      - ./data/nginx/log:/var/log/nginx
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - api-service
+      - editor
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+
+  db:
+    image: postgres:12
+    volumes:
+      - ./data/openpecha:/var/lib/postgresql/data/pgdata
+    env_file:
+      - openpecha-api/.env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+
+  api-service:
+    image: openpecha/api-service
+    container_name: api-service
+    build:
+      context: ./openpecha-api
+    ports:
+      - 8000:80
+    volumes:
+      - ./data/openpecha:/root/.openpecha
+    restart: always
+
+  editor:
+    image: openpecha/editor
+    container_name: editor
+    build:
+      context: ./openpecha-editor
+    restart: always
