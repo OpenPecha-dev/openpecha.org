@@ -1,0 +1,6 @@
+[submodule "openpecha-api"]
+	path = openpecha-api
+	url = https://github.com/OpenPecha-dev/openpecha-api.git
+[submodule "openpecha-editor"]
+	path = openpecha-editor
+	url = https://github.com/OpenPecha-dev/openpecha-editor.git
