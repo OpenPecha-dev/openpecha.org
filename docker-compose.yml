@@ -1,6 +1,5 @@
 version: "3.3"
 services:
-
   proxy:
     image: traefik:v2.2
     networks:
@@ -138,7 +137,7 @@ services:
         - traefik.http.services.${STACK_NAME?Variable not set}-flower.loadbalancer.server.port=5555
 
   api:
-    image: '${DOCKER_IMAGE_API?Variable not set}:${TAG-latest}'
+    image: "${DOCKER_IMAGE_API?Variable not set}:${TAG-latest}"
     volumes:
       - ./data/openpecha:/root/.openpecha
     depends_on:
@@ -150,11 +149,6 @@ services:
       - SERVER_HOST=https://${DOMAIN?Variable not set}
       # Allow explicit env var override for tests
       - SMTP_HOST=${SMTP_HOST}
-    build:
-      context: ./openpecha-api
-      dockerfile: api.dockerfile
-      args:
-        INSTALL_DEV: ${INSTALL_DEV-false}
     deploy:
       labels:
         - traefik.enable=true
@@ -163,7 +157,7 @@ services:
         - traefik.http.services.${STACK_NAME?Variable not set}-api.loadbalancer.server.port=80
 
   celeryworker:
-    image: '${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}'
+    image: "${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}"
     depends_on:
       - db
       - queue
@@ -174,18 +168,11 @@ services:
       - SERVER_HOST=https://${DOMAIN?Variable not set}
       # Allow explicit env var override for tests
       - SMTP_HOST=${SMTP_HOST?Variable not set}
-    build:
-      context: ./openpecha-api
-      dockerfile: celeryworker.dockerfile
-      args:
-        INSTALL_DEV: ${INSTALL_DEV-false}
 
   editor:
-    image: '${DOCKER_IMAGE_EDITOR?Variable not set}:${TAG-latest}'
-    build:
-      context: ./openpecha-editor
-      args:
-        FRONTEND_ENV: ${FRONTEND_ENV-production}
+    image: "${DOCKER_IMAGE_EDITOR?Variable not set}:${TAG-latest}"
+    env_file:
+      - .env
     deploy:
       labels:
         - traefik.enable=true
