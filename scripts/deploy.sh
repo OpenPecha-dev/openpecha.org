@@ -6,7 +6,8 @@ set -e
 DOMAIN=${DOMAIN?Variable not set} \
 TRAEFIK_TAG=${TRAEFIK_TAG?Variable not set} \
 STACK_NAME=${STACK_NAME?Variable not set} \
-TAG=${TAG?Variable not set} \
+API_TAG=${API_TAG?Variable not set} \
+EDITOR_TAG=${EDITOR_TAG?Variable not set} \
 docker-compose \
 -f docker-compose.yml \
 config > docker-stack.yml
