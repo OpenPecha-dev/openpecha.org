@@ -171,8 +171,6 @@ services:
 
   editor:
     image: "${DOCKER_IMAGE_EDITOR?Variable not set}:${TAG-latest}"
-    env_file:
-      - .env
     deploy:
       labels:
         - traefik.enable=true
